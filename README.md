@@ -25,3 +25,6 @@ dans le package.json mettre ceci à la place du script existant:
 installer mongoose pour la base de donnée
 
 mpn i mongoose
+
+
+npm install cors

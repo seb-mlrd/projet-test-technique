@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des utilisateurs</title>
+    <style>
+        table { border-collapse: collapse; width: 60%; margin: 20px auto; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">Liste des utilisateurs</h1>
+    <table id="users-table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Âge</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les utilisateurs seront insérés ici -->
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/users');
+                const users = await response.json();
+                const tbody = document.querySelector('#users-table tbody');
+                tbody.innerHTML = '';
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.age}</td>
+                        <td>
+                            <button onclick="deleteUser('${user._id}')">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                alert('Erreur lors de la récupération des utilisateurs');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) return;
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('Utilisateur supprimé');
+                    fetchUsers();
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            } catch (error) {
+                alert('Erreur de communication avec le serveur');
+            }
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>

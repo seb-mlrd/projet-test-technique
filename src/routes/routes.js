@@ -1,41 +1,36 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const app = express();
+const router = express.Router();
 const User = require('../models/user');
 
-mongoose.connect('mongodb://localhost:27017/node_mongo',{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-
-})
-.then(() => {
-    console.log('connexion à la base de données réussie');
-})
-.catch((err) => {
-  console.log('connexion à la base de données échouée');
-})
-
 // route pour créer un utilisateur
-app.post('/users', async (req, res) => {
-        const { name, email, age } = req.body;
+router.post('/users', async (req, res) => {
+    const { name, email, age, password } = req.body;
     try {
-        const user = new User({ name, email, age });
+        const user = new User({ name, email, age, password });
         await user.save();
-        res.status(201).send(user)
+        res.status(201).send(user);
     } catch (error) {
-        res.status(400).send(err)
+        res.status(400).send({ message: 'Erreur lors de la création de l\'utilisateur' });
     }
 })
 
 // route pour supprimer un utilisateur
-app.delete('/users/:id', (req, res) => {
+router.delete('/users/:id', async (req, res) => {
     const userId = req.params.id;
-    res.status(200).send(`Utilisateur avec l'ID ${userId} supprimé`);
+    try {
+        const deleteUser = await User.findByIdAndDelete(userId);
+        if (!deleteUser) {
+            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+        }
+        res.status(200).send({ message: 'Utilisateur supprimé avec succès' });
+    }catch (error) {
+        res.status(500).send({ message: 'Erreur lors de la suppression de l\'utilisateur' });
+    }
 });
 
 // route pour lister tous les utilisateurs
-app.get('/users', async (req, res) => {
-        try {
+router.get('/users', async (req, res) => {
+    try {
         const users = await User.find();
         res.send(users);
     }catch (error) {
@@ -43,6 +38,4 @@ app.get('/users', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log('server is running on port 3000');
-});
+module.exports = router;

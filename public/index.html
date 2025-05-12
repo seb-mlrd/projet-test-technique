@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire d'Inscription</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Accueil</a></li>
+            <li><a href="/list.html">Liste des utilisateurs</a></li>
+        </ul>
+    </nav>
+    <h1>Inscription</h1>
+    <form id="signup-form">
+        <label for="name">Nom:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="age">Âge:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <button type="submit">S'inscrire</button>
+    </form>
+    
+    <script>
+        // Récupérer le formulaire et l'écouter
+        const form = document.getElementById('signup-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Empêche le comportement par défaut de soumettre le formulaire
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+
+            const age = parseInt(data.age, 10);
+                if (isNaN(age)) {
+                    alert("L'âge doit être un nombre valide.");
+                return;
+            }
+            // Envoi des données au back-end (API)
+            try {
+                console.log(JSON.stringify(data));
+                const response = await fetch('/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert('Utilisateur créé avec succès!');
+                } else {
+                    const error = await response.json();
+                    alert(`Erreur: ${error.message}`);
+                }
+            } catch (error) {
+                alert('Erreur de communication avec le serveur');
+            }
+        });
+    </script>
+</body>
+</html>
