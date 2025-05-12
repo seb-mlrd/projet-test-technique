@@ -21,3 +21,7 @@ dans le package.json mettre ceci à la place du script existant:
     "test:init": "jest --config jest.integration.config.js",
     "test:e2e": "cypress open"
   },
+
+installer mongoose pour la base de donnée
+
+mpn i mongoose
